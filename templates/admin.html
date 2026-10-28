@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Trang Quản Trị - Thêm Sản Phẩm</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6">Thêm Sản Phẩm Mới</h2>
+    
+    <!-- Form gửi dữ liệu (bao gồm cả file) -->
+    <form id="addProductForm" enctype="multipart/form-data" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Tên sản phẩm</label>
+        <input type="text" name="name" required class="mt-1 w-full border border-gray-300 p-2 rounded">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Giá tiền (VNĐ)</label>
+        <input type="number" name="price" required class="mt-1 w-full border border-gray-300 p-2 rounded">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Danh mục</label>
+        <input type="text" name="category" required class="mt-1 w-full border border-gray-300 p-2 rounded">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Hình ảnh</label>
+        <input type="file" name="image" accept="image/*" required class="mt-1 w-full text-sm text-gray-500">
+      </div>
+      
+      <button type="submit" class="w-full bg-gray-900 text-white p-2 rounded hover:bg-gray-800">
+        Lưu Sản Phẩm
+      </button>
+    </form>
+  </div>
+  <!-- KHU VỰC 2: BẢNG DANH SÁCH ĐƠN HÀNG -->
+  <div class="max-w-4xl mx-auto mt-8 bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6">Đơn Hàng Gần Đây</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-100 text-sm">
+            <th class="p-3 border-b font-semibold text-gray-700">Mã</th>
+            <th class="p-3 border-b font-semibold text-gray-700">Khách hàng</th>
+            <th class="p-3 border-b font-semibold text-gray-700">SĐT</th>
+            <th class="p-3 border-b font-semibold text-gray-700">Sản phẩm (SL)</th>
+            <th class="p-3 border-b font-semibold text-gray-700">Tổng tiền</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm">
+          <!-- Vòng lặp Jinja2 in từng đơn hàng ra bảng -->
+          {% for order in orders %}
+          <tr class="border-b hover:bg-gray-50 transition">
+            <td class="p-3 text-gray-500">#{{ order.id }}</td>
+            <td class="p-3 font-semibold text-gray-900">{{ order.customer_name }}</td>
+            <td class="p-3 text-blue-600 font-medium">{{ order.customer_phone }}</td>
+            <td class="p-3 text-gray-600">{{ order.items_summary }}</td>
+            <td class="p-3 font-bold text-red-600">{{ "{:,.0f}".format(order.total_price) }} ₫</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="p-6 text-center text-gray-400">Chưa có đơn hàng nào.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- KHU VỰC: BẢNG QUẢN LÝ SẢN PHẨM -->
+  <div class="max-w-4xl mx-auto mt-8 bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6">Quản Lý Sản Phẩm</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-100 text-sm">
+            <th class="p-3 border-b font-semibold text-gray-700">Mã</th>
+            <th class="p-3 border-b font-semibold text-gray-700">Ảnh</th>
+            <th class="p-3 border-b font-semibold text-gray-700">Tên sản phẩm</th>
+            <th class="p-3 border-b font-semibold text-gray-700">Giá</th>
+            <th class="p-3 border-b font-semibold text-gray-700">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm">
+          {% for product in products %}
+          <tr class="border-b hover:bg-gray-50 transition">
+            <td class="p-3 text-gray-500">#{{ product.id }}</td>
+            <td class="p-3">
+              <img src="{{ product.image_url }}" alt="img" class="w-10 h-10 object-cover rounded shadow-sm">
+            </td>
+            <td class="p-3 font-semibold text-gray-900">{{ product.name }}</td>
+            <td class="p-3 text-gray-600">{{ "{:,.0f}".format(product.price) }} ₫</td>
+            <td class="p-3">
+              <!-- Nút xóa gọi hàm Javascript -->
+              <button onclick="deleteProduct({{ product.id }})" class="text-red-600 hover:text-red-800 font-medium">Xóa</button>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="p-6 text-center text-gray-400">Chưa có sản phẩm nào.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      
+      try {
+        const response = await fetch('/api/admin/products', {
+          method: 'POST',
+          body: formData // Gửi formData tự động xử lý file ảnh
+        });
+        const result = await response.json();
+        if (result.status === "success") {
+          alert(result.message);
+          e.target.reset(); // Xóa form sau khi thêm xong
+        }
+      } catch (error) {
+        alert("Lỗi khi thêm sản phẩm!");
+      }
+    });
+    // Hàm gọi API xóa sản phẩm
+    async function deleteProduct(productId) {
+      if (!confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) return;
+      
+      try {
+        const response = await fetch(`/api/admin/products/${productId}`, {
+          method: 'DELETE'
+        });
+        const result = await response.json();
+        
+        if (result.status === "success") {
+          alert(result.message);
+          window.location.reload(); // Tự động tải lại trang để làm mới bảng
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        alert("Có lỗi xảy ra khi xóa sản phẩm!");
+      }
+    }// Hàm gọi API xóa sản phẩm
+    async function deleteProduct(productId) {
+      if (!confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) return;
+      
+      try {
+        const response = await fetch(`/api/admin/products/${productId}`, {
+          method: 'DELETE'
+        });
+        const result = await response.json();
+        
+        if (result.status === "success") {
+          alert(result.message);
+          window.location.reload(); // Tự động tải lại trang để làm mới bảng
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        alert("Có lỗi xảy ra khi xóa sản phẩm!");
+      }
+    }
+    // Hàm gọi API xóa sản phẩm
+    async function deleteProduct(productId) {
+      if (!confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) return;
+      
+      try {
+        const response = await fetch(`/api/admin/products/${productId}`, {
+          method: 'DELETE'
+        });
+        const result = await response.json();
+        
+        if (result.status === "success") {
+          alert(result.message);
+          window.location.reload(); // Tự động tải lại trang để làm mới bảng
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        alert("Có lỗi xảy ra khi xóa sản phẩm!");
+      }
+    }
+  </script>
+</body>
+</html>
