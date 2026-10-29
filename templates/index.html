@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Minimalist Store - Trang chủ</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -21,18 +19,15 @@
   <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <button class="p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition">
-          <i class="fa-solid fa-bars text-xl"></i>
-        </button>
-        <button class="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">
-          Logo
-        </button>
+        <button class="p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition"><i class="fa-solid fa-bars text-xl"></i></button>
+        <button class="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">Logo</button>
       </div>
       <div class="flex items-center space-x-2">
-        <button class="p-2.5 rounded-lg text-gray-700 hover:bg-gray-100 transition">
+        <!-- NÚT USER MỞ MODAL ĐĂNG NHẬP -->
+        <button id="authToggleBtn" class="p-2.5 rounded-lg text-gray-700 hover:bg-gray-100 transition">
           <i class="fa-regular fa-user text-lg"></i>
         </button>
-        <!-- Nút Giỏ hàng -->
+        <!-- NÚT GIỎ HÀNG -->
         <button id="cartToggleBtn" class="relative p-2.5 rounded-lg text-gray-700 hover:bg-gray-100 transition">
           <i class="fa-solid fa-cart-shopping text-lg"></i>
           <span id="cartBadge" class="absolute -top-0.5 -right-0.5 bg-gray-900 text-white text-[11px] font-semibold w-5 h-5 rounded-full flex items-center justify-center">0</span>
@@ -42,14 +37,12 @@
   </header>
 
   <!-- ==========================================
-       MAIN CONTENT (Danh sách sản phẩm từ DB)
+       SẢN PHẨM
        ========================================== -->
   <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex items-baseline justify-between mb-6">
       <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Sản phẩm</h1>
     </div>
-
-    <!-- KHU VỰC JINJA2 RENDER SẢN PHẨM -->
     <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {% for product in products %}
       <article class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col">
@@ -61,16 +54,8 @@
             <h2 class="text-base font-semibold text-gray-900 line-clamp-1">{{ product.name }}</h2>
             <p class="mt-1 text-sm font-medium text-gray-600">{{ "{:,.0f}".format(product.price) }} ₫</p>
           </div>
-          <!-- Nút thêm vào giỏ mang theo thông tin ID, Tên, Giá -->
-          <button
-            type="button"
-            data-add-id="{{ product.id }}"
-            data-add-name="{{ product.name }}"
-            data-add-price="{{ product.price }}"
-            class="add-to-cart-btn mt-4 w-full py-2 px-3 bg-gray-100 hover:bg-gray-900 hover:text-white text-gray-800 text-xs font-medium rounded-lg transition flex items-center justify-center gap-1.5"
-          >
-            <i class="fa-solid fa-plus text-[11px]"></i>
-            <span>Thêm vào giỏ</span>
+          <button type="button" data-add-id="{{ product.id }}" data-add-name="{{ product.name }}" data-add-price="{{ product.price }}" class="add-to-cart-btn mt-4 w-full py-2 px-3 bg-gray-100 hover:bg-gray-900 hover:text-white text-gray-800 text-xs font-medium rounded-lg transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-plus text-[11px]"></i><span>Thêm vào giỏ</span>
           </button>
         </div>
       </article>
@@ -79,40 +64,103 @@
   </main>
 
   <!-- ==========================================
-       CART DRAWER (Khay Giỏ hàng bên phải)
+       GIỎ HÀNG (Khay kéo)
        ========================================== -->
   <div id="cartDrawer" class="fixed inset-0 z-40 hidden">
-    <div id="cartBackdrop" class="fixed inset-0 bg-black/30 backdrop-blur-xs"></div>
-    <aside class="fixed right-0 top-0 w-80 max-w-[85vw] bg-white h-full shadow-xl border-l border-gray-200 p-6 flex flex-col justify-between z-10">
+    <div id="cartBackdrop" class="fixed inset-0 bg-black/30 backdrop-blur-sm"></div>
+    <aside class="fixed right-0 top-0 w-80 max-w-[85vw] bg-white h-full shadow-xl border-l border-gray-200 p-6 flex flex-col justify-between z-50">
       <div class="flex-1 flex flex-col min-h-0">
         <div class="flex items-center justify-between pb-4 border-b border-gray-100">
           <span class="text-lg font-bold text-gray-900">Giỏ hàng</span>
-          <button id="closeCartBtn" class="p-2 text-gray-500 hover:text-gray-900">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
+          <button id="closeCartBtn" class="p-2 text-gray-500 hover:text-gray-900"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div id="cartItemsList" class="flex-1 overflow-y-auto py-4 space-y-3"></div>
       </div>
       <div class="pt-4 border-t border-gray-200">
         <div class="flex items-center justify-between text-sm font-semibold text-gray-900 mb-4">
-          <span>Tổng cộng:</span>
-          <span id="cartTotalPrice">0 ₫</span>
+          <span>Tổng cộng:</span><span id="cartTotalPrice">0 ₫</span>
         </div>
-        <button id="checkoutBtn" type="button" class="w-full py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition">
-          Thanh toán
-        </button>
+        <button id="checkoutBtn" type="button" class="w-full py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition">Thanh toán</button>
       </div>
     </aside>
   </div>
 
-  <!-- TOAST THÔNG BÁO -->
-  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 hidden bg-gray-900 text-white text-xs sm:text-sm px-4 py-2.5 rounded-lg shadow-lg flex items-center space-x-2">
-    <i class="fa-solid fa-circle-check text-gray-300"></i>
-    <span id="toastMessage">Đã thêm vào giỏ hàng</span>
+  <!-- ==========================================
+       MODAL TÀI KHOẢN (Đăng Nhập/Ký)
+       ========================================== -->
+  <div id="authModal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
+    <div id="authBackdrop" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 m-4 overflow-hidden z-10">
+      <button id="closeAuthBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+
+      <!-- Đăng Nhập -->
+      <div id="loginView" class="block">
+        <h2 class="text-2xl font-bold text-gray-900 text-center mb-6">Đăng Nhập</h2>
+        <form id="loginForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Tài khoản</label>
+            <input type="text" name="username" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Mật khẩu</label>
+            <input type="password" name="password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none">
+          </div>
+          <div class="flex justify-end">
+            <a href="#" onclick="switchAuthView('forgotView')" class="text-sm text-blue-600 hover:underline">Quên mật khẩu?</a>
+          </div>
+          <button type="submit" class="w-full bg-gray-900 text-white font-bold py-2.5 rounded-lg hover:bg-gray-800 transition">VÀO HỆ THỐNG</button>
+        </form>
+        <p class="text-center text-sm text-gray-600 mt-6">Chưa có tài khoản? <a href="#" onclick="switchAuthView('registerView')" class="text-blue-600 font-semibold hover:underline">Đăng ký ngay</a></p>
+      </div>
+
+      <!-- Đăng Ký -->
+      <div id="registerView" class="hidden">
+        <h2 class="text-2xl font-bold text-gray-900 text-center mb-6">Đăng Ký</h2>
+        <form id="registerForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Tài khoản</label>
+            <input type="text" name="username" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+            <input type="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Mật khẩu</label>
+            <input type="password" name="password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none">
+          </div>
+          <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-lg hover:bg-blue-700 transition">TẠO TÀI KHOẢN</button>
+        </form>
+        <p class="text-center text-sm text-gray-600 mt-6">Đã có tài khoản? <a href="#" onclick="switchAuthView('loginView')" class="text-gray-900 font-semibold hover:underline">Đăng nhập</a></p>
+      </div>
+
+      <!-- Quên MK -->
+      <div id="forgotView" class="hidden">
+        <h2 class="text-2xl font-bold text-gray-900 text-center mb-4">Khôi phục mật khẩu</h2>
+        <p class="text-sm text-gray-600 text-center mb-6">Nhập email của bạn, chúng tôi sẽ gửi liên kết tạo lại mật khẩu.</p>
+        <form id="forgotForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Email của bạn</label>
+            <input type="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none">
+          </div>
+          <button type="submit" class="w-full bg-gray-900 text-white font-bold py-2.5 rounded-lg hover:bg-gray-800 transition">GỬI YÊU CẦU</button>
+        </form>
+        <div class="text-center mt-6">
+          <a href="#" onclick="switchAuthView('loginView')" class="text-sm text-gray-600 font-semibold hover:underline"><i class="fa-solid fa-arrow-left mr-1"></i> Quay lại đăng nhập</a>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ==========================================
-       JAVASCRIPT XỬ LÝ GIỎ HÀNG & API
+       TOAST THÔNG BÁO
+       ========================================== -->
+  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 hidden bg-gray-900 text-white text-xs sm:text-sm px-4 py-2.5 rounded-lg shadow-lg flex items-center space-x-2">
+    <i class="fa-solid fa-circle-check text-gray-300"></i><span id="toastMessage">Thông báo</span>
+  </div>
+
+  <!-- ==========================================
+       JAVASCRIPT TỔNG HỢP
        ========================================== -->
   <script>
     const cart = {};
@@ -134,6 +182,9 @@
       const badge = document.getElementById('cartBadge');
       const list = document.getElementById('cartItemsList');
       const totalEl = document.getElementById('cartTotalPrice');
+      
+      // Chống lỗi nếu mất phần tử HTML
+      if(!badge || !list || !totalEl) return;
 
       const entries = Object.values(cart);
       const totalCount = entries.reduce((sum, item) => sum + item.qty, 0);
@@ -161,81 +212,167 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      // --- HIỂN THỊ TÊN TRÊN HEADER NẾU ĐÃ ĐĂNG NHẬP ---
+      async function updateHeaderAuth() {
+        try {
+          const checkRes = await fetch('/api/check-login');
+          const authStatus = await checkRes.json();
+          
+          if (authStatus.is_logged_in) {
+            const authBtn = document.getElementById('authToggleBtn');
+            if (authBtn) {
+              // Thay thế icon người dùng bằng Tên và nút Đăng xuất
+              authBtn.outerHTML = `
+                <div class="flex items-center space-x-3 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">
+                  <span class="text-sm font-semibold text-gray-800">Chào, ${authStatus.username}</span>
+                  <div class="w-px h-4 bg-gray-300"></div>
+                  <a href="/logout" class="text-xs text-red-500 hover:text-red-700 font-bold transition">Thoát</a>
+                </div>
+              `;
+            }
+          }
+        } catch (error) {
+          console.error("Lỗi cập nhật header:", error);
+        }
+      }
+      
+      // Gọi hàm ngay khi vừa tải trang xong
+      updateHeaderAuth();
+      
+      // --- 1. TÀI KHOẢN (AUTH MODAL) ---
+      const authModal = document.getElementById('authModal');
+      const authToggleBtn = document.getElementById('authToggleBtn');
+      if(authToggleBtn) {
+        authToggleBtn.addEventListener('click', () => {
+          authModal.classList.remove('hidden');
+          switchAuthView('loginView');
+        });
+      }
+      document.getElementById('closeAuthBtn').addEventListener('click', () => authModal.classList.add('hidden'));
+      document.getElementById('authBackdrop').addEventListener('click', () => authModal.classList.add('hidden'));
+
+      window.switchAuthView = function(viewId) {
+        ['loginView', 'registerView', 'forgotView'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        document.getElementById(viewId).classList.remove('hidden');
+      };
+
+      async function handleAuthSubmit(e, apiPath, successAction) {
+        e.preventDefault();
+        try {
+          const res = await fetch(apiPath, { method: 'POST', body: new FormData(e.target) });
+          const data = await res.json();
+          if (res.ok) {
+            showToast(data.message || "Thành công!");
+            if (successAction) successAction();
+          } else {
+            alert(data.message || data.detail || "Có lỗi xảy ra!"); 
+          }
+        } catch (error) {
+          alert("Lỗi kết nối tới máy chủ!");
+        }
+      }
+
+      document.getElementById('loginForm').addEventListener('submit', (e) => {
+        handleAuthSubmit(e, '/api/login', () => {
+          authModal.classList.add('hidden');
+          // Reload để trình duyệt nhận diện cookie đăng nhập
+          window.location.reload(); 
+        });
+      });
+      document.getElementById('registerForm').addEventListener('submit', (e) => handleAuthSubmit(e, '/api/register', () => switchAuthView('loginView')));
+      document.getElementById('forgotForm').addEventListener('submit', (e) => handleAuthSubmit(e, '/api/forgot-password', () => switchAuthView('loginView')));
+
+      // --- 2. GIỎ HÀNG ---
       renderCart();
 
-      // Bấm nút: Thêm vào giỏ
-      document.getElementById('productGrid').addEventListener('click', (e) => {
-        const btn = e.target.closest('.add-to-cart-btn');
-        if (!btn) return;
-        const id = Number(btn.getAttribute('data-add-id'));
-        const name = btn.getAttribute('data-add-name');
-        const price = Number(btn.getAttribute('data-add-price'));
-        
-        if (!cart[id]) {
-          cart[id] = { product: { id, name, price }, qty: 0 };
-        }
-        cart[id].qty += 1;
-        renderCart();
-        showToast(`Đã thêm "${name}" vào giỏ`);
-      });
+      // Thêm sản phẩm
+      const productGrid = document.getElementById('productGrid');
+      if(productGrid) {
+        productGrid.addEventListener('click', (e) => {
+          const btn = e.target.closest('.add-to-cart-btn');
+          if (!btn) return;
+          const id = Number(btn.getAttribute('data-add-id'));
+          const name = btn.getAttribute('data-add-name');
+          const price = Number(btn.getAttribute('data-add-price'));
+          
+          if (!cart[id]) cart[id] = { product: { id, name, price }, qty: 0 };
+          cart[id].qty += 1;
+          renderCart();
+          showToast(`Đã thêm "${name}" vào giỏ`);
+        });
+      }
 
-      // Bấm nút: Xóa khỏi giỏ
-      document.getElementById('cartItemsList').addEventListener('click', (e) => {
-        const btn = e.target.closest('.remove-cart-item-btn');
-        if (!btn) return;
-        delete cart[Number(btn.getAttribute('data-remove-id'))];
-        renderCart();
-      });
+      // Xóa sản phẩm
+      const cartItemsList = document.getElementById('cartItemsList');
+      if(cartItemsList) {
+        cartItemsList.addEventListener('click', (e) => {
+          const btn = e.target.closest('.remove-cart-item-btn');
+          if (!btn) return;
+          delete cart[Number(btn.getAttribute('data-remove-id'))];
+          renderCart();
+        });
+      }
 
-      // Đóng/mở Menu Giỏ hàng
+      // Đóng/mở Khay Giỏ hàng
       const cartDrawer = document.getElementById('cartDrawer');
-      document.getElementById('cartToggleBtn').addEventListener('click', () => cartDrawer.classList.remove('hidden'));
+      const cartToggleBtn = document.getElementById('cartToggleBtn');
+      if(cartToggleBtn) cartToggleBtn.addEventListener('click', () => cartDrawer.classList.remove('hidden'));
       document.getElementById('closeCartBtn').addEventListener('click', () => cartDrawer.classList.add('hidden'));
       document.getElementById('cartBackdrop').addEventListener('click', () => cartDrawer.classList.add('hidden'));
 
-      // NÚT THANH TOÁN: Gọi API Python lưu vào Database
-      document.getElementById('checkoutBtn').addEventListener('click', async () => {
-        const entries = Object.values(cart);
-        if (entries.length === 0) {
-          showToast('Giỏ hàng đang trống!');
-          return;
-        }
+      // Nút Thanh toán
+      const checkoutBtn = document.getElementById('checkoutBtn');
+      if(checkoutBtn) {
+        checkoutBtn.addEventListener('click', async () => {
+          const entries = Object.values(cart);
+          if (entries.length === 0) return showToast('Giỏ hàng đang trống!');
 
-        const name = prompt("Vui lòng nhập Tên của bạn:");
-        if (!name) return;
-        const phone = prompt("Vui lòng nhập Số điện thoại:");
-        if (!phone) return;
-
-        // Chuẩn bị dữ liệu gửi đi
-        const orderData = {
-          customer_name: name,
-          customer_phone: phone,
-          items: entries.map(e => ({
-            product_id: e.product.id,
-            quantity: e.qty,
-            price: e.product.price
-          }))
-        };
-
-        try {
-          const response = await fetch('/api/orders', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(orderData)
-          });
-          
-          const result = await response.json();
-          if (result.status === "success") {
-            // Xóa rỗng giỏ hàng sau khi đặt thành công
-            Object.keys(cart).forEach(k => delete cart[k]);
-            renderCart();
-            cartDrawer.classList.add('hidden');
-            showToast('Đơn hàng đã được gửi thành công!');
+          // Kiểm tra xem khách đã đăng nhập chưa
+          try {
+            const checkRes = await fetch('/api/check-login');
+            const authStatus = await checkRes.json();
+            
+            if (!authStatus.is_logged_in) {
+              cartDrawer.classList.add('hidden'); // Tắt giỏ hàng
+              authModal.classList.remove('hidden'); // Bật modal đăng nhập
+              switchAuthView('loginView');
+              showToast('Vui lòng đăng nhập để thanh toán!');
+              return; // Dừng tiến trình mua hàng
+            }
+          } catch (error) {
+            return showToast('Lỗi kiểm tra đăng nhập.');
           }
-        } catch (error) {
-          showToast('Có lỗi xảy ra, vui lòng thử lại.');
-        }
-      });
+
+          // Khách ĐÃ đăng nhập -> Tiếp tục hỏi Tên và Số điện thoại
+          const name = prompt("Vui lòng nhập Tên của bạn:");
+          if (!name) return;
+          const phone = prompt("Vui lòng nhập Số điện thoại:");
+          if (!phone) return;
+
+          const orderData = {
+            customer_name: name,
+            customer_phone: phone,
+            items: entries.map(e => ({ product_id: e.product.id, quantity: e.qty, price: e.product.price }))
+          };
+
+          try {
+            const response = await fetch('/api/orders', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(orderData)
+            });
+            const result = await response.json();
+            if (result.status === "success") {
+              Object.keys(cart).forEach(k => delete cart[k]);
+              renderCart();
+              cartDrawer.classList.add('hidden');
+              showToast('Đơn hàng đã được gửi thành công!');
+            }
+          } catch (error) {
+            showToast('Có lỗi xảy ra, vui lòng thử lại.');
+          }
+        });
+      }
     });
   </script>
 </body>

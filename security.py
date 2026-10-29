@@ -1,18 +1,15 @@
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-import secrets
+from fastapi import Request, HTTPException, status
 
-security = HTTPBasic()
-
-# Hàm kiểm tra mật khẩu
-def verify_admin(credentials: HTTPBasicCredentials = Depends(security)):
-    correct_username = secrets.compare_digest(credentials.username, "tuanviet")
-    correct_password = secrets.compare_digest(credentials.password, "182207")
+# Giữ nguyên tên hàm verify_admin để các file khác gọi không bị lỗi
+async def verify_admin(request: Request):
+    # Tìm thẻ cookie có tên "session_token" do form đăng nhập cấp
+    session_token = request.cookies.get("session_token")
     
-    if not (correct_username and correct_password):
+    # Nếu chưa đăng nhập (không có cookie) hoặc thẻ bị sai -> Đá về trang /login
+    if not session_token or session_token != "token_bi_mat_cua_tuan_viet":
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Sai tài khoản hoặc mật khẩu",
-            headers={"WWW-Authenticate": "Basic"},
+            status_code=status.HTTP_303_SEE_OTHER,
+            headers={"Location": "/"} 
         )
-    return credentials.username
+    
+    return "tuanviet"

@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 import os
 
 # Import các cổng kết nối (routers) vừa tạo
-from routers import admin, store
+from routers import admin, store, auth
 
 app = FastAPI()
 
@@ -12,5 +12,7 @@ os.makedirs("static/images", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Gắn các Module (routers) vào app chính
+# Đăng ký các router
+app.include_router(auth.router)
 app.include_router(store.router)
 app.include_router(admin.router)

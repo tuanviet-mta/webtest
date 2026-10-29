@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Request, Depends, UploadFile, File, Form
+from fastapi import APIRouter, Request, Depends, UploadFile, File, Form, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 import shutil
 
-from database import get_db, Product, Order
+from database import get_db, Product, Order,User
 from security import verify_admin
 
 router = APIRouter()
@@ -58,3 +58,23 @@ async def delete_product(
     db.delete(product)
     db.commit()
     return {"status": "success", "message": "Đã xóa sản phẩm thành công!"}
+
+@router.get("/api/users")
+async def get_all_users(db: Session = Depends(get_db)):
+    users = db.query(User).all()
+    return [{"id": u.id, "username": u.username, "email": u.email, "role": u.role} for u in users]
+
+# API: Xóa tài khoản
+@router.delete("/api/users/{user_id}")
+async def delete_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Không tìm thấy tài khoản")
+    
+    # Không cho phép xóa chính tài khoản admin gốc
+    if user.username == "tuanviet":
+        raise HTTPException(status_code=400, detail="Không thể xóa Admin gốc!")
+        
+    db.delete(user)
+    db.commit()
+    return {"status": "success", "message": "Đã xóa tài khoản"}
